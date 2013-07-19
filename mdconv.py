@@ -63,6 +63,7 @@ if target is None or target == []:
     for f in glob.glob("*.md"):
         convert(f)
 else:
-    print("[INFO] Converting selected files")
-    for f in target:
-        convert(f)
+    print("[INFO] Converting selected file(s)")
+    for t in target:
+        for f in glob.glob(t):
+            convert(f)
