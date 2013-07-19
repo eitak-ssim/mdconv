@@ -1,2 +1,68 @@
+#!/usr/bin/python
 import glob
 import markdown
+import sys
+
+def convert(fn):
+    # make the new filename
+    newfn = fn[:-3]+".html"
+
+    print("[CONV] %s => %s" % (fn, newfn))
+
+    # open and read the md file
+    try:
+        mdfile = open(fn,"r")
+    except IOError:
+        print("[NOPE] File %s doesn't exist, are you mad!?" % fn)
+        sys.exit(1)
+
+    mdtext = mdfile.read()
+
+    # convert it
+    html = markdown.markdown(mdtext)
+
+    # close it
+    mdfile.close()
+
+    # write the new html
+    htmlfile = open(newfn,"w")
+    htmlfile.write(header+"\n\n"+html+"\n\n"+footer)
+    htmlfile.close()
+
+# get the header/footer
+try:
+    hfile = open(".mdc_header","r")
+except IOError:
+    hfile = None
+
+try:
+    ffile = open(".mdc_footer","r")
+except IOError:
+    ffile = None
+
+if hfile is None:
+    header = "<!doctype html>"
+else:
+    header = hfile.read()
+    hfile.close()
+
+if ffile is None:
+    footer = ""
+else:
+    footer = ffile.read()
+    ffile.close()
+
+# figure out if it's a full-on convert or just a single file
+try:
+    target = sys.argv[1:]
+except IndexError:
+    target = None
+
+if target is None or target == []:
+    print("[INFO] Converting all files in cwd")
+    for f in glob.glob("*.md"):
+        convert(f)
+else:
+    print("[INFO] Converting selected files")
+    for f in target:
+        convert(f)
