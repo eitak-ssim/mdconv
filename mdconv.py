@@ -3,6 +3,14 @@ import glob
 import markdown
 import sys
 
+def openFile(path, mode):
+    # check python version so we always open UTF-8.
+    if sys.version_info[0] == 2:
+        import codecs
+        return codecs.open(path, mode, "utf-8")
+    else:
+        return open(path, mode, encoding="utf-8")
+
 def convert(fn):
     # make the new filename
     newfn = fn[:-3]+".html"
@@ -11,7 +19,7 @@ def convert(fn):
 
     # open and read the md file
     try:
-        mdfile = open(fn,"r")
+        mdfile = openFile(fn,"r")
     except IOError:
         print("[NOPE] File %s doesn't exist, are you mad!?" % fn)
         sys.exit(1)
@@ -25,18 +33,18 @@ def convert(fn):
     mdfile.close()
 
     # write the new html
-    htmlfile = open(newfn,"w")
+    htmlfile = openFile(newfn,"w")
     htmlfile.write(header+"\n\n"+html+"\n\n"+footer)
     htmlfile.close()
 
 # get the header/footer
 try:
-    hfile = open(".mdc_header","r")
+    hfile = openFile(".mdc_header","r")
 except IOError:
     hfile = None
 
 try:
-    ffile = open(".mdc_footer","r")
+    ffile = openFile(".mdc_footer","r")
 except IOError:
     ffile = None
 
